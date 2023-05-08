@@ -1,11 +1,11 @@
-import SolarSystem from './SolarSystem';
+import SolarSystem from "./SolarSystem";
 
 const App = () => {
-  return (
-    <div>
-      <SolarSystem />
-    </div>
-  );
+    return (
+        <div>
+            <SolarSystem />
+        </div>
+    );
 };
 
 export default App;
