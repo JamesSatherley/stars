@@ -14,6 +14,7 @@ const camera = new THREE.PerspectiveCamera(
 );
 
 const SolarSystem = () => {
+    console.log("SolarSystem rendered");
     useEffect(() => {
         setupRenderer();
         setupScene();
@@ -75,11 +76,36 @@ const createPlanets = () => {
     scene.add(sun);
 
     const planetsData = [
-        { size: 3.2, texture: textures.mercury, position: 28 },
-        { size: 5.8, texture: textures.venus, position: 44 },
-        { size: 6, texture: textures.earth, position: 62 },
-        { size: 4, texture: textures.mars, position: 78 },
-        { size: 12, texture: textures.jupiter, position: 100 },
+        {
+            size: 3.2,
+            texture: textures.mercury,
+            position: 28,
+            initialAngle: Math.random() * 360,
+        },
+        {
+            size: 5.8,
+            texture: textures.venus,
+            position: 44,
+            initialAngle: Math.random() * 360,
+        },
+        {
+            size: 6,
+            texture: textures.earth,
+            position: 62,
+            initialAngle: Math.random() * 360,
+        },
+        {
+            size: 4,
+            texture: textures.mars,
+            position: 78,
+            initialAngle: Math.random() * 360,
+        },
+        {
+            size: 12,
+            texture: textures.jupiter,
+            position: 100,
+            initialAngle: Math.random() * 360,
+        },
         {
             size: 10,
             texture: textures.saturn,
@@ -89,6 +115,7 @@ const createPlanets = () => {
                 outerRadius: 20,
                 texture: textures.saturnRing,
             },
+            initialAngle: Math.random() * 360,
         },
         {
             size: 7,
@@ -99,9 +126,20 @@ const createPlanets = () => {
                 outerRadius: 12,
                 texture: textures.uranusRing,
             },
+            initialAngle: Math.random() * 360,
         },
-        { size: 7, texture: textures.neptune, position: 200 },
-        { size: 2.8, texture: textures.pluto, position: 216 },
+        {
+            size: 7,
+            texture: textures.neptune,
+            position: 200,
+            initialAngle: Math.random() * 360,
+        },
+        {
+            size: 2.8,
+            texture: textures.pluto,
+            position: 216,
+            initialAngle: Math.random() * 360,
+        },
     ];
 
     const planets = planetsData.map((planetData) => {
@@ -121,7 +159,7 @@ const createSun = () => {
     return new THREE.Mesh(sunGeo, sunMat);
 };
 
-const createPlanet = ({ size, texture, position, ring }) => {
+const createPlanet = ({ size, texture, position, ring, initialAngle }) => {
     const textureLoader = new THREE.TextureLoader();
 
     const geo = new THREE.SphereGeometry(size, 30, 30);
@@ -146,16 +184,21 @@ const createPlanet = ({ size, texture, position, ring }) => {
 
         const ringMesh = new THREE.Mesh(ringGeo, ringMat);
         obj.add(ringMesh);
-        ringMesh.position.x = position;
+        ringMesh.position.x =
+            position * Math.cos(initialAngle * (Math.PI / 180));
+        ringMesh.position.z =
+            position * Math.sin(initialAngle * (Math.PI / 180));
         ringMesh.rotation.x = -0.5 * Math.PI;
     }
 
-    mesh.position.x = position;
+    mesh.position.x = position * Math.cos(initialAngle * (Math.PI / 180));
+    mesh.position.z = position * Math.sin(initialAngle * (Math.PI / 180));
+
     return { mesh, obj };
 };
 
-const generateWeightedRandomNumber = () => {
-    return Math.random() * (0.002 - 0.0005) + 0.0005;
+const generateRandomNumber = () => {
+    return Math.random() * (0.0002 - 0.0005) + 0.0005;
 };
 
 const animate = () => {
@@ -166,7 +209,7 @@ const animate = () => {
                 child instanceof THREE.Mesh &&
                 !(child.parent instanceof THREE.RingGeometry)
             ) {
-                child.rotateY(generateWeightedRandomNumber());
+                child.rotateY(generateRandomNumber());
             }
         });
 
@@ -176,7 +219,7 @@ const animate = () => {
                 child instanceof THREE.Object3D &&
                 !child.children.some((c) => c instanceof THREE.RingGeometry)
             ) {
-                child.rotateY(generateWeightedRandomNumber());
+                child.rotateY(generateRandomNumber());
             }
         });
 
