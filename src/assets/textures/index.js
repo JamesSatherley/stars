@@ -12,7 +12,7 @@ import uranusRing from "./uranusRing.png";
 import neptune from "./neptune.jpg";
 import pluto from "./pluto.jpg";
 
-export default {
+const images = {
     stars,
     sun,
     mercury,
@@ -27,3 +27,5 @@ export default {
     neptune,
     pluto,
 };
+
+export default images;
