@@ -1,5 +1,6 @@
 import stars from "./stars.jpg";
 import sun from "./sun.jpg";
+import moon from "./moon.jpg";
 import mercury from "./mercury.jpg";
 import venus from "./venus.jpg";
 import earth from "./earth.jpg";
@@ -15,6 +16,7 @@ import pluto from "./pluto.jpg";
 const images = {
     stars,
     sun,
+    moon,
     mercury,
     venus,
     earth,

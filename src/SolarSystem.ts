@@ -14,7 +14,7 @@ const camera = new THREE.PerspectiveCamera(
     1000
 );
 
-const SolarSystem = () => {
+const SolarSystem: React.FC = () => {
     useEffect(() => {
         setupSite();
         animate();
@@ -28,13 +28,13 @@ const SolarSystem = () => {
 
     return (
         <div
-            style={{ padding: "0px", margin: "0px" }} // didn't change white borders
+            style={{ padding: "0px", margin: "0px" }}
             ref={(ref) => ref && ref.appendChild(renderer.domElement)}
         />
     );
 };
 
-const setupSite = () => {
+const setupSite = (): void => {
     /* Setup Renderer */
     renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
 
@@ -44,7 +44,7 @@ const setupSite = () => {
 
     /* Setup Camera */
     camera.position.set(-90, 140, 140);
-    camera.far = 10000; // Increase the far value
+    camera.far = 10000;
     camera.updateProjectionMatrix();
 
     /* Setup Orbit Controls */
@@ -54,12 +54,12 @@ const setupSite = () => {
     /* Setup Lighting */
     const ambientLight = new THREE.AmbientLight(0x333333);
     scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffffff, 2, 1000); // Increase the distance
-    pointLight.intensity = 1.5; // Adjust the intensity
+    const pointLight = new THREE.PointLight(0xffffff, 2, 1000);
+    pointLight.intensity = 1.5;
     scene.add(pointLight);
 };
 
-const createStarsBackground = () => {
+const createStarsBackground = (): THREE.CubeTexture => {
     const cubeTextureLoader = new THREE.CubeTextureLoader();
     return cubeTextureLoader.load([
         textures.stars,
@@ -71,11 +71,36 @@ const createStarsBackground = () => {
     ]);
 };
 
-const createPlanets = () => {
+interface Planet {
+    mesh: THREE.Mesh;
+    obj: THREE.Object3D;
+}
+
+interface PlanetData {
+    size: number;
+    texture: string;
+    position: number;
+    ring?: {
+        innerRadius: number;
+        outerRadius: number;
+        texture: string;
+    };
+    initialAngle: number;
+    moons?: MoonData[];
+}
+
+interface MoonData {
+    size: number;
+    texture: string;
+    position: number;
+    initialAngle: number;
+}
+
+const createPlanets = (): { sun: THREE.Mesh; planets: Planet[] } => {
     const sun = createSun();
     scene.add(sun);
 
-    const planets = planetsData.map((planetData) => {
+    const planets: Planet[] = planetsData.map((planetData) => {
         const planet = createPlanet(planetData);
         scene.add(planet.obj);
 
@@ -92,7 +117,7 @@ const createPlanets = () => {
     return { sun, planets };
 };
 
-const createSun = () => {
+const createSun = (): THREE.Mesh => {
     const sunGeo = new THREE.SphereGeometry(16, 30, 30);
     const sunMat = new THREE.MeshBasicMaterial({
         map: new THREE.TextureLoader().load(textures.sun),
@@ -100,7 +125,13 @@ const createSun = () => {
     return new THREE.Mesh(sunGeo, sunMat);
 };
 
-const createPlanet = ({ size, texture, position, ring, initialAngle }) => {
+const createPlanet = ({
+    size,
+    texture,
+    position,
+    ring,
+    initialAngle,
+}: PlanetData): Planet => {
     position = position * 1.5;
     const textureLoader = new THREE.TextureLoader();
 
@@ -132,7 +163,7 @@ const createPlanet = ({ size, texture, position, ring, initialAngle }) => {
             position * Math.sin(initialAngle * (Math.PI / 180));
         ringMesh.rotation.x = -0.5 * Math.PI;
 
-        ringMesh.userData.isRing = true; // Set custom property for the ring
+        ringMesh.userData.isRing = true;
     }
 
     mesh.position.x = position * Math.cos(initialAngle * (Math.PI / 180));
@@ -142,9 +173,9 @@ const createPlanet = ({ size, texture, position, ring, initialAngle }) => {
 };
 
 const createMoon = (
-    { size, texture, position, initialAngle },
-    parentObject
-) => {
+    { size, texture, position, initialAngle }: MoonData,
+    parentObject: THREE.Object3D
+): { mesh: THREE.Mesh; obj: THREE.Object3D } => {
     const textureLoader = new THREE.TextureLoader();
 
     const geo = new THREE.SphereGeometry(size, 30, 30);
@@ -156,7 +187,6 @@ const createMoon = (
     const obj = new THREE.Object3D();
     obj.add(mesh);
 
-    // Position the moon relative to the parent planet
     const distanceFromPlanet = position * 2;
     obj.position.set(distanceFromPlanet, 0, 0);
 
@@ -170,20 +200,18 @@ const createMoon = (
     return { mesh, obj };
 };
 
-const generateRandomNumber = () => {
+const generateRandomNumber = (): number => {
     return Math.random() * (0.0002 - 0.0005) + 0.0005;
 };
 
-const animate = () => {
+const animate = (): void => {
     renderer.setAnimationLoop(() => {
-        // Self-rotation
         scene.traverse((child) => {
             if (child instanceof THREE.Mesh && !child.userData.isRing) {
                 child.rotateY(generateRandomNumber());
             }
         });
 
-        // Around-sun-rotation
         scene.traverse((child) => {
             if (child instanceof THREE.Object3D && !child.userData.isRing) {
                 child.rotateY(generateRandomNumber());
@@ -194,7 +222,7 @@ const animate = () => {
     });
 };
 
-const handleResize = () => {
+const handleResize = (): void => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
